@@ -1,5 +1,5 @@
 --Simple Cho by Twoods196
---Does not Auto Update
+
 myHero = GetMyHero()
 if myHero.charName ~= "Chogath" then return end
 local ts
