@@ -2,6 +2,37 @@
 
 myHero = GetMyHero()
 if myHero.charName ~= "Chogath" then return end
+--[[		Auto Update		]]
+local version = "1.0"
+local author = "Twoods196"
+local SCRIPT_NAME = "SimpleCho"
+local AUTOUPDATE = true
+local UPDATE_HOST = "raw.githubusercontent.com"
+local UPDATE_PATH = "Twoods196/BOLSimpleCho/master/SimpleCho%20-%20Twoods196.lua".."?rand="..math.random(1,10000)
+local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
+local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
+
+function AutoupdaterMsg(msg) print("<font color=\"#FF0000\"><b>SimpleCho:</b></font> <font color=\"#FFFFFF\">"..msg..".</font>") end
+if AUTOUPDATE then
+	local ServerData = GetWebResult(UPDATE_HOST,"Twoods196/BOLSimpleCho/master/SimpleCho.version")
+	if ServerData then
+		ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
+		if ServerVersion then
+			if tonumber(version) < ServerVersion then
+				AutoupdaterMsg("New version available "..ServerVersion)
+				AutoupdaterMsg("Updating, please don't press F9")
+				DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () AutoupdaterMsg("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
+			else
+				AutoupdaterMsg("You have got the latest version ("..ServerVersion..")")
+			end
+		end
+	else
+		AutoupdaterMsg("Error downloading version info")
+	end
+end
+
+
+
 local ts
 local SACLoaded, SxOrbLoaded, orbWalkLoaded = false
 if not _G.UPLloaded then
