@@ -143,7 +143,7 @@ if (ts.target ~= nil) then
 --Cast Spell
 
 CastPosition, HitChance, HeroPosition = UPL:Predict(_Q, myHero, ts.target)
-	if HitChance >= 2 then
+	if HitChance >= Config.hc then
 	CastSpell(_Q, CastPosition.x, CastPosition.z)
 	end
 if (myHero:CanUseSpell(_W) == READY) then
