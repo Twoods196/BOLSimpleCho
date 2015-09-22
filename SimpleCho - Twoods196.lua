@@ -4,7 +4,7 @@ myHero = GetMyHero()
 if myHero.charName ~= "Chogath" then return end
 
 --[[		Auto Update		]]
-local version = "1.1"
+local version = "1.2"
 local author = "Twoods196"
 local SCRIPT_NAME = "SimpleCho"
 local AUTOUPDATE = true
