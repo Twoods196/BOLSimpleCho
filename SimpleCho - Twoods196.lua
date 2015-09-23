@@ -59,6 +59,7 @@ end
 function OnLoad()
 DelayAction(function() CheckOrbWalker() end, 10)
 UPL:AddSpell(_Q, { speed = math.huge, delay = 0.625, range = 950, width = 300, collision = false, aoe = true, type = "circular"})
+UPL:AddSpell(_W, { speed = math.huge, delay = 0.5, range = 650, width = 275, collision = false, aoe = false, type = "linear"})
 Menu()
 ts = TargetSelector(TARGET_LOW_HP_PRIORITY,950)
 end
