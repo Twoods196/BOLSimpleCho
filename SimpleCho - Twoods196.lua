@@ -144,8 +144,10 @@ CastPosition, HitChance, HeroPosition = UPL:Predict(_Q, myHero, ts.target)
 	CastSpell(_Q, CastPosition.x, CastPosition.z)
 	end
 if (myHero:CanUseSpell(_W) == READY) then
+	if GetDistanceSqr(target) <= Spells.W.range * Spells.W.range then
 CastPosition, HitChance, HeroPosition = UPL:Predict(_W, myHero, ts.target)
 CastSpell(_W, CastPosition.x, CastPosition.z)
+end
 end
 if (myHero:CanUseSpell(_R) == READY) then
 local Rdmg = getDmg('R', target, myHero)
