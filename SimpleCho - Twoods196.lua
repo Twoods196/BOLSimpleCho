@@ -1,10 +1,10 @@
 --Simple Cho by Twoods196
---Does not Auto Update
+
 myHero = GetMyHero()
 if myHero.charName ~= "Chogath" then return end
 
 --[[		Auto Update		]]
-local version = "1.2"
+local version = "1.3"
 local author = "Twoods196"
 local SCRIPT_NAME = "SimpleCho"
 local AUTOUPDATE = true
@@ -39,7 +39,6 @@ Spells = {
 				["Q"] = { speed = math.huge, delay = 0.625, range = 950, width = 300, collision = false, aoe = true, type = "circular"},
         ["W"] = { speed = math.huge, delay = 0.5, range = 650, width = 275, collision = false, aoe = false, type = "linear"}
 	}
-
 local ts
 local SACLoaded, SxOrbLoaded, orbWalkLoaded = false
 if not _G.UPLloaded then
@@ -62,7 +61,6 @@ DelayAction(function() CheckOrbWalker() end, 10)
 UPL:AddSpell(_Q, { speed = math.huge, delay = 0.625, range = 950, width = 300, collision = false, aoe = true, type = "circular"})
 Menu()
 ts = TargetSelector(TARGET_LOW_HP_PRIORITY,950)
-
 end
 
 
@@ -74,7 +72,10 @@ function CheckOrbWalker()
 	elseif FileExist(LIB_PATH .. "SxOrbWalk.lua") then
 		require("SxOrbWalk")
 		SxOrbLoaded = true 
-		_G.SxOrb:LoadToMenu(Menu.orbwalker)
+		Config:addSubMenu("["..myHero.charName.."] - Orbwalking Settings", "Orbwalking")
+ 	    SxOrb:LoadToMenu(Config.Orbwalking)
+		--_G.SxOrb:LoadToMenu(Config.orbwalker)
+	
 	end
 
 	if SACLoaded or SxOrbLoaded then
@@ -94,9 +95,10 @@ function Menu()
 Config = scriptConfig("Simple Cho - Twoods196", "Settings")
 	
 	Config:addParam("drawCircle", "Draw Q Range", SCRIPT_PARAM_ONOFF, true)
-	Config:addParam("combo", "Combo mode", SCRIPT_PARAM_ONKEYDOWN, false, 32)
-  Config:addParam("hc", "Accuracy (Default 2)", SCRIPT_PARAM_SLICE, 2, 0, 3, 1)
-UPL:AddToMenu(Config)
+	Config:addParam("combo", "Combo mode", SCRIPT_PARAM_ONKEYDOWN, false, string.byte(" "))
+    Config:addParam("hc", "Accuracy (Default 2)", SCRIPT_PARAM_SLICE, 2, 0, 3, 1)
+    UPL:AddToMenu(Config)
+
 print("<b><font color=\"#6699FF\">Simple Cho - Twoods196:</font></b> <font color=\"#FFFFFF\">Sucessfully loaded!</font>")
 end
 
@@ -104,9 +106,7 @@ end
 function OnTick()
 
 ts:update()
-
 target = ts.target
-
 Combo()
 end
 
@@ -120,9 +120,6 @@ red = ARGB(150, 255,0,0)
     if (Config.drawCircle) then
 		if (myHero:CanUseSpell(_Q) == READY) then
         DrawCircle3D(myHero.x, myHero.y, myHero.z, 950, 4, red)
-				end
-				if (myHero:CanUseSpell(_W) == READY) then
-        DrawCircle3D(myHero.x, myHero.y, myHero.z, 650, 4, red)
 				end
 				end
  end
@@ -147,10 +144,8 @@ CastPosition, HitChance, HeroPosition = UPL:Predict(_Q, myHero, ts.target)
 	CastSpell(_Q, CastPosition.x, CastPosition.z)
 	end
 if (myHero:CanUseSpell(_W) == READY) then
-if GetDistanceSqr(target) <= Spells.W.range * Spells.W.range then
 CastPosition, HitChance, HeroPosition = UPL:Predict(_W, myHero, ts.target)
 CastSpell(_W, CastPosition.x, CastPosition.z)
-end
 end
 if (myHero:CanUseSpell(_R) == READY) then
 local Rdmg = getDmg('R', target, myHero)
