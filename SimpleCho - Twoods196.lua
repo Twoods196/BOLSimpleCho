@@ -4,7 +4,7 @@ myHero = GetMyHero()
 if myHero.charName ~= "Chogath" then return end
 
 --[[		Auto Update		]]
-local version = "1.4"
+local version = "1.5"
 local author = "Twoods196"
 local SCRIPT_NAME = "SimpleCho"
 local AUTOUPDATE = true
@@ -34,15 +34,18 @@ end
 
 
 
+
+
 --Intializing Variables
 Spells = {
-				["Q"] = { speed = math.huge, delay = 0.625, range = 950, width = 300, collision = false, aoe = true, type = "circular"},
+				["Q"] = { speed = math.huge, delay = 0.625, range = 900, width = 300, collision = false, aoe = true, type = "circular"},
         ["W"] = { speed = math.huge, delay = 0.5, range = 650, width = 275, collision = false, aoe = false, type = "linear"}
 	}
 local minions
 local qRange, wRange, eRange  = 950, 700, 500 
 local ts
 local SACLoaded, SxOrbLoaded, orbWalkLoaded = false
+local passiveStacks = 0
 if not _G.UPLloaded then
   if FileExist(LIB_PATH .. "/UPL.lua") then
     require("UPL")
@@ -60,13 +63,19 @@ end
 -- called once when the script is loaded
 function OnLoad()
 DelayAction(function() CheckOrbWalker() end, 10)
-UPL:AddSpell(_Q, { speed = math.huge, delay = 0.625, range = 950, width = 300, collision = false, aoe = true, type = "circular"})
+UPL:AddSpell(_Q, { speed = math.huge, delay = 0.625, range = 900, width = 300, collision = false, aoe = true, type = "circular"})
 UPL:AddSpell(_W, { speed = math.huge, delay = 0.5, range = 650, width = 275, collision = false, aoe = false, type = "linear"})
 Menu()
 ts = TargetSelector(TARGET_LESS_CAST_PRIORITY, qRange, true)
-minions = minionManager(MINION_ENEMY, myHero.range, myHero, MINION_SORT_HEALTH_ASC)
+
 end
 
+
+function OnUpdateBuff(unit, buff, stacks)
+if unit and unit.isMe and buff and (buff.name == "Feast") then
+passiveStacks = stacks
+end 
+end
 
 function CheckOrbWalker() 
 	if _G.Reborn_Initialised then
@@ -100,6 +109,7 @@ function Menu()
 Config = scriptConfig("Simple Cho - Twoods196", "Settings")
 	  Config:addSubMenu("Combo Settings", "Combo")
     Config:addSubMenu("Draw Settings", "Draw")
+		Config:addSubMenu("Stack Settings", "Stack")
 		
 		--> Basic Settings
 Config.Combo:addParam("doCombo", "Q-W combo", SCRIPT_PARAM_ONKEYDOWN, false, 32)
@@ -107,7 +117,7 @@ Config.Combo:addParam("usew", "Use W in Combo", SCRIPT_PARAM_ONOFF, true)
 Config.Combo:addParam("autoult", "Auto use Ult", SCRIPT_PARAM_ONOFF, true)
 
 		
-		
+		Config.Stack:addParam("stack", "Auto Stack R on Minions", SCRIPT_PARAM_ONOFF, true)
 		
 	 
     Config:addParam("hc", "Accuracy (Default 2)", SCRIPT_PARAM_SLICE, 2, 0, 3, 1)
@@ -136,10 +146,39 @@ function OnTick()
 ts:update()
 target = ts.target
 Combo()
-
+if Config.Stack.stack then
+ultMin()
+end
 end
 
+function ultMin()
 
+if passiveStacks < 6 then
+print(passiveStacks)
+enemyMinions = minionManager(MINION_ENEMY, 600, player, MINION_SORT_HEALTH_ASC)
+enemyMinions:update()
+local player = GetMyHero()
+local tick = 0
+local delay = 0
+local myTarget = ts.target
+local Rrange = 275
+
+
+
+for index, minion in pairs(enemyMinions.objects) do
+if GetDistance(minion, myHero) <= Rrange and GetTickCount() > tick + delay then
+local dmg = getDmg("R", minion, myHero)
+if dmg > minion.health then
+CastSpell(_R, minion)
+tick = GetTickCount()
+AttackMinion = true
+else
+AttackMinion = false
+end
+end
+end
+end
+end
 
 
 --handles overlay drawing (processing is not recommended here,use onTick() for that)
@@ -148,13 +187,13 @@ function OnDraw()
 red = ARGB(150, 255,0,0)
     if (Config.Draw.drawQ) then
 		if (myHero:CanUseSpell(_Q) == READY) then
-        DrawCircle3D(myHero.x, myHero.y, myHero.z, 950, 4, red)
+        DrawCircle3D(myHero.x, myHero.y, myHero.z, 900, 4, red)
 				end
 				end
 				
 				if (Config.Draw.drawW) then
 		if (myHero:CanUseSpell(_W) == READY) then
-        DrawCircle3D(myHero.x, myHero.y, myHero.z, 700, 4, red)
+        DrawCircle3D(myHero.x, myHero.y, myHero.z, 650, 4, red)
 				end
 				end
  end
